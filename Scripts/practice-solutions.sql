@@ -99,12 +99,61 @@ select account_no, min(transaction_date) as transaction_date from cte where curr
 
 ---------------------------------------------------------------------------------------------------
 
+-- TRIGGER in postgres
+
+CREATE TABLE COMPANY(
+   ID INT PRIMARY KEY     NOT NULL,
+   NAME           TEXT    NOT NULL,
+   AGE            INT     NOT NULL,
+   ADDRESS        CHAR(50),
+   SALARY         REAL
+);
+
+CREATE TABLE company_audit(
+   EMP_ID INT NOT NULL,
+   ENTRY_DATE TEXT NOT NULL
+);
 
 
+create or replace trigger emp_audit_trg after insert on company
+for each row execute procedure auditlogfunc();
+
+create or replace function auditlogfunc() returns trigger as $emp_audit_trg$
+begin
+	insert into company_audit(EMP_ID,ENTRY_DATE) values (new.id,current_date);
+	return new;
+end;
+$emp_audit_trg$ language plpgsql;
+
+INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+VALUES (1, 'Paul', 32, 'California', 20000.00 );
 
 
+------------------------------------------------------------------------
+
+/*Functions and procedure syntax postgres
+ 
+ create or replace procedure()
+language plpgsql
+as $$
+begin
 
 
+end;
+$$;
+
+
+create or replace functions()
+returns table () as $$ / returns integer as $column_name$
+begin
+
+
+end;
+$$ / $column_name$
+language plpgsql;
+*/
+
+-------------------------------------------------------------------------------
 
 
 
